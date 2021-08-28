@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Buscaminas</title>
+  <link rel="shortcut icon" href="/images/explosion.jpg" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+
+<body id="body">
+  <h1>Buscaminas</h1>
+  <div id="niveles">
+    <h2>Selecione un nivel</h2>
+    <input class="btn btn-primary" type="button" value="Fácil" onclick="creartablarero(6,8), cargar(1)">
+    <input class="btn btn-success" type="button" value="Médio" onclick="creartablarero(10,15), cargar(2)">
+    <input class="btn btn-danger" type="button" value="Difícil" onclick="creartablarero(15,20), cargar(3)">
+  </div>
+  <br>
+  <div id="tabla" style="display: inline-block;">
+    <table id="tablero">
+    </table>
+    <div id="datos">
+      <table id="cronometro" class="cronometro">
+        <tbody>
+          <tr class="info">
+            <td colspan="4">Tiempo</td>
+          </tr>
+          <tr class="info">
+            <td id="minutos">00</td>
+            <td id="segundos">00</td>
+          </tr>
+          <tr class="info">
+            <td colspan="4">Puntuaje</td>
+          </tr>
+          <tr class="info">
+            <td id="puntos">00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script>
+    const $tablero = $('#tablero');
+    const $body = $('#body');
+    const $datos = $('#datos');
+    var tabla = document.createElement("div");
+    var t = 0;
+    var min = 0;
+    var puntuaje = 0;
+
+    var cronometro;
+
+    function cargar(contador_m) {
+
+      var contador_s = 0;
+      s = document.getElementById("segundos");
+      m = document.getElementById("minutos");
+
+      cronometro = setInterval(
+        function () {
+          if (contador_m == 0 && contador_s == 0) {
+            terminado();
+            finDelJuego(false);
+          }
+          if (contador_s < 00) {
+            contador_s = 59;
+            contador_m--;
+            m.innerHTML = contador_m;
+          }
+          s.innerHTML = contador_s;
+          contador_s--;
+
+        }
+        , 1000);
+
+    }
+    function terminado() {
+
+      clearInterval(cronometro);
+    }
+
+    function creartablarero(tamaño, m) {
+      $("#tablero").children().prop('disabled', false);
+      t = tamaño;
+      min = m;
+      var minas = 0;
+      $tablero.empty();
+      for (let x = 0; x < tamaño; x++) {
+        const $fila = $('<tr>').addClass('fila');
+        for (let y = 0; y < tamaño; y++) {
+          const $columna = $('<rd>')
+            .addClass('columna Ocul')
+            .attr('data-row', x)
+            .attr('data-col', y);
+          if (Math.random() < 0.1) {
+            $columna.addClass('mina');
+            minas++
+          }
+
+          $fila.append($columna);
+        }
+        $tablero.append($fila);
+      }
+
+      if (minas < min) {
+        reiniciar();
+      }
+
+    }
+
+
+
+
+    function reiniciar() {
+      $body.removeClass('fin');
+      $("#niveles").children().prop('disabled', false);
+      $("#tablero").children().prop('disabled', true);
+      var s = document.getElementById("segundos");
+      var m = document.getElementById("minutos");
+      s.innerHTML = 00;
+      m.innerHTML = 00;
+      var puntos = document.getElementById("puntos");
+      puntos.innerHTML = 00;
+      puntuaje = 0;
+      $tablero.removeClass('perdido');
+
+      terminado();
+      creartablarero(t, min);
+
+    }
+
+
+    function finDelJuego(ganado) {
+      let message = null;
+      let icon = null;
+      if (ganado) {
+        message = 'GANASTE ESTA PARTIDA!';
+        icon = 'fa fa-flag';
+      } else {
+        $tablero.addClass('perdido');
+        message = 'HAS PERDIDO!';
+        icon = 'fa fa-bomb';
+        $body.addClass('fin');
+      }
+      $('.columna.mina').append(
+        $('<i>').addClass(icon)
+      );
+      $('.columna:not(.mina)').html(function () {
+        const $cell = $(this);
+        const count = getMina(
+          $cell.data('row'),
+          $cell.data('col'),
+        );
+        return count === 0 ? '' : count;
+      })
+      $('.columna.Ocul').removeClass('Ocul');
+      setTimeout(function () {
+        alert(message);
+        reiniciar();
+      }, 1000);
+    }
+
+    $tablero.on('click', '.columna.Ocul', function () {
+      $("#niveles").children().prop('disabled', true);
+      const $cell = $(this);
+      const row = $cell.data('row');
+      const col = $cell.data('col');
+
+      if ($cell.hasClass('mina')) {
+        finDelJuego(false);
+      } else {
+        mostrar(row, col);
+        const isGameOver = $('.columna.Ocul').length === $('.columna.mina').length
+        if (isGameOver) finDelJuego(true);
+      }
+    })
+
+    function punto(fil, colum) {
+      puntuaje++;
+      var puntos = document.getElementById("puntos");
+      puntos.innerHTML = puntuaje;
+
+    }
+
+    function getMina(i, j) {
+      let count = 0;
+      for (let di = -1; di <= 1; di++) {
+        for (let dj = -1; dj <= 1; dj++) {
+          const ni = i + di;
+          const nj = j + dj;
+          if (ni >= t || nj >= t || nj < 0 || ni < 0) continue;
+          const $cell =
+            $(`.columna.Ocul[data-row=${ni}][data-col=${nj}]`);
+          if ($cell.hasClass('mina')) count++;
+        }
+      }
+      return count;
+    }
+
+
+    function mostrar(oi, oj) {
+      const listos = {};
+
+
+
+      function extra(i, j) {
+        if (i >= t || j >= t || i < 0 || j < 0) return;
+        const key = `${i} ${j}`
+        if (listos[key]) return;
+        const $cell =
+          $(`.columna.Ocul[data-row=${i}][data-col=${j}]`);
+        const mineCount = getMina(i, j);
+        if (
+          !$cell.hasClass('Ocul') ||
+          $cell.hasClass('mina')
+        ) {
+          return;
+        }
+
+        $cell.removeClass('Ocul');
+
+        if (mineCount) {
+          punto();
+          $cell.text(mineCount);
+          return;
+        }
+
+        for (let di = -1; di <= 1; di++) {
+          for (let dj = -1; dj <= 1; dj++) {
+            extra(i + di, j + dj);
+          }
+        }
+      }
+      extra(oi, oj);
+
+    }
+  </script>
+</body>
+
+</html>
