@@ -6,7 +6,7 @@
 body {
   font-family: 'Inconsolata', monospace;
   text-align: center;
-  background-image: url("/images/fondo.jpg");
+  background-image: url("images/fondo.jpg");
   background-size: 100%;
   background-repeat: no-repeat;
 }
@@ -14,7 +14,7 @@ body {
 .fin {
   font-family: 'Inconsolata', monospace;
   text-align: center;
-  background-image: url("/images/explosion.jpg");
+  background-image: url("images/explosion.jpg");
   background-size: 100%;
 }
 
@@ -40,7 +40,7 @@ body {
 }
 
 .perdido{
-  cursor:url("/images/pico2.gif"), auto;  
+  cursor:url("images/pico2.gif"), auto;  
 }
 
 .fila {
@@ -58,16 +58,16 @@ body {
   color: black;
   font-size: 20px;
   transition: all 1.0s;
-  background-image: url("/images/rocas.jpg");
+  background-image: url("images/rocas.jpg");
 }
 
  .columna.mina {
-  background-image: url("/images/mina.jpg");
+  background-image: url("images/mina.jpg");
 
  }
 
 .columna.Ocul {
-  background-image: url("/images/roca.jpg");
+  background-image: url("images/roca.jpg");
   cursor: pointer;
   cursor:url(pico.gif), auto;
 }
